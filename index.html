@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Document</title>
+
+    <link rel="stylesheet" type="text/css" href="main.css" />
+
+    <script src="./node_modules/web3/dist/web3.min.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Coursetro Instructor</h1>
+
+      <h2 id="instructor"></h2>
+
+      <label for="name" class="col-lg-2 control-label">Instructor Name</label>
+      <input id="name" type="text" />
+
+      <label for="name" class="col-lg-2 control-label">Instructor Age</label>
+      <input id="age" type="number" />
+
+      <button id="button">Update Instructor</button>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+
+    <script>
+      // const getWeb3 = async () => {
+      //   let web3;
+
+      //   if (
+      //     typeof window !== "undefined" &&
+      //     typeof window.ethereum !== "undefined"
+      //   ) {
+      //     // We are in the browser and metamask is running.
+      //     window.ethereum.request({ method: "eth_requestAccounts" });
+      //     web3 = new Web3(window.ethereum);
+      //   } else {
+      //     // We are on the server *OR* the user is not running metamask
+      //     const provider = new Web3.providers.HttpProvider(
+      //       "http://127.0.0.1:7545"
+      //     );
+      //     web3 = new Web3(provider);
+      //     console.log(web3.eth.accounts[0]);
+      //   } // Previous if/else statement removed for brevity
+
+      //   const accounts = await web3.eth.getAccounts();
+      //   console.log("Here is your account:", accounts[0]);
+      //   return web3;
+      // };
+      // const web3 = getWeb3();
+      // let abi;
+      // fetch("./abi.json")
+      //   .then((response) => {
+      //     return response.json();
+      //   })
+      //   .then((data) => {
+      //       console.log(data.output.abi)
+      //       abi = data.output.abi;
+      //   });
+
+      // console.log("ABIIII",abi);
+
+      // var Coutsetro = new web3.eth.Contract(
+      //   abi,
+      //   "0x2035688D413C42E0AAB2f32bf528416978c5951F"
+      // );
+
+      // if (typeof web3 !== "undefiend") {
+      //   web3 = new Web3(web3.currentProvider);
+      // } else {
+      web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:7545"));
+      // }
+      var ContractAdress = "0x049C81e032D5CeaEA88F18C70A78BcF6cC41ac4A";
+
+      //set provider for all later instances to use
+      var amIGhost = "Yes";
+      var CoursetroContract = new web3.eth.Contract(
+        [
+          {
+            inputs: [],
+            name: "getInstructor",
+            outputs: [
+              {
+                internalType: "string",
+                name: "",
+                type: "string",
+              },
+              {
+                internalType: "uint256",
+                name: "",
+                type: "uint256",
+              },
+            ],
+            stateMutability: "view",
+            type: "function",
+          },
+          {
+            inputs: [
+              {
+                internalType: "string",
+                name: "_fName",
+                type: "string",
+              },
+              {
+                internalType: "uint256",
+                name: "_age",
+                type: "uint256",
+              },
+            ],
+            name: "setInstructor",
+            outputs: [],
+            stateMutability: "nonpayable",
+            type: "function",
+          },
+        ],
+        "0x36B92606C30a6596dE359B121f22799161eD5b72"
+      );
+
+      CoursetroContract.methods
+        .getInstructor()
+        .call()
+        .then((result) => {
+          console.log(result);
+          $("#instructor").html(result[0] + " (" + result[1] + " years old)");
+        });
+
+      $("#button").click(function () {
+        CoursetroContract.methods
+          .setInstructor($("#name").val(), $("#age").val())
+          .send({ from: ContractAdress })
+          .then(() => {
+            CoursetroContract.methods
+              .getInstructor()
+              .call()
+              .then((result) => {
+                console.log(result);
+                $("#instructor").html(
+                  result[0] + " (" + result[1] + " years old)"
+                );
+              });
+          });
+      });
+    </script>
+  </body>
+</html>
